@@ -13,6 +13,7 @@
 #include <stdint.h>
 
 #include "neo/types.hpp"
+#include "neo/scene.hpp"
 
 namespace jsi::neo
 {
@@ -29,15 +30,40 @@ public:
 
     void render(const std::shared_ptr<Scene>& scene)
     {
+        // Set screen in scene for component rendering
+        scene->setScreen(this);
+        
+        // Clear screen (set all pixels to black)
         for (size_t y = 0; y < screen_size_.height; ++y)
         {
             for (size_t x = 0; x < screen_size_.width; ++x)
             {
                 size_t index = y * screen_size_.width + x;
-                set_pixel_function_(index, 255, 0, 0, 255);
+                set_pixel_function_(index, 0, 0, 0, 0);
             }
         }
+        
+        // Render all components
+        for (const auto& [id, component] : scene->getComponents())
+        {
+            component->render();
+        }
+        
+        // Display the rendered pixels
         show_function_();
+    }
+    
+    void setPixel(int x, int y, const Color& color)
+    {
+        // Bounds checking
+        if (x < 0 || x >= static_cast<int>(screen_size_.width) || 
+            y < 0 || y >= static_cast<int>(screen_size_.height))
+        {
+            return;
+        }
+        
+        size_t index = y * screen_size_.width + x;
+        set_pixel_function_(index, color.r, color.g, color.b, color.a);
     }
 
 private:

@@ -10,7 +10,9 @@
 namespace jsi::neo
 {
 
-class Scene
+class Screen;
+
+class Scene : public std::enable_shared_from_this<Scene>
 {
     friend class Component;
 
@@ -18,12 +20,19 @@ public:
     Scene()  = default;
     ~Scene() = default;
 
-    void addComponent(std::shared_ptr<Component> component)
+    template <typename T, typename... Args>
+    uint64_t addComponent(Args&&... args)
     {
-        auto id         = components_.size();
-        components_[id] = std::move(component);
+        auto     ptr       = shared_from_this();
+        auto     component = std::make_shared<T>(ptr, std::forward<Args>(args)...);
+        uint64_t id        = components_.size();
+        components_[id]    = std::move(component);
+        return id;
     }
     std::map<uint64_t, std::shared_ptr<Component>>& getComponents() { return components_; }
+
+    void    setScreen(Screen* screen) { screen_ = screen; }
+    Screen* getScreen() const { return screen_; }
 
     void tick(const uint64_t& dt)
     {
@@ -50,6 +59,7 @@ public:
 private:
     std::map<uint64_t, std::shared_ptr<Component>> components_;
     PortList                                       port_list_;
+    Screen*                                        screen_ = nullptr;
 };
 
 }  // namespace jsi::neo

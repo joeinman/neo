@@ -8,7 +8,12 @@ namespace jsi::neo
 class Rectangle : public Component
 {
 public:
-    Rectangle(std::shared_ptr<Scene> scene, int x, int y, int width, int height, const Color& color) :
+    Rectangle(std::shared_ptr<Scene> scene,
+              Value<int>             x,
+              Value<int>             y,
+              Value<int>             width,
+              Value<int>             height,
+              Value<Color>           color) :
         Component(scene), x_(x), y_(y), width_(width), height_(height), color_(color)
     {}
 

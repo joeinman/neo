@@ -44,7 +44,11 @@ public:
         screen_->render(scene_);
     }
 
-    void loadScene(std::shared_ptr<Scene> scene) noexcept { scene_ = std::move(scene); }
+    void loadScene(std::shared_ptr<Scene> scene) noexcept 
+    { 
+        scene_ = std::move(scene); 
+        scene_->setScreen(screen_.get());
+    }
 
     void runTrigger(const std::string& trigger_name) noexcept { scene_->runTrigger(trigger_name); }
 
