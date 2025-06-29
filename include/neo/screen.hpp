@@ -14,7 +14,7 @@
 
 #include "neo/types.hpp"
 
-namespace jsi
+namespace jsi::neo
 {
 
 class Screen
@@ -46,4 +46,4 @@ private:
     ShowFunction     show_function_;
 };
 
-}  // namespace jsi
+}  // namespace jsi::neo

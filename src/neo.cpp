@@ -10,5 +10,5 @@
 
 #include "neo/neo.hpp"
 
-namespace jsi
-{}  // namespace jsi
+namespace jsi::neo
+{}  // namespace jsi::neo

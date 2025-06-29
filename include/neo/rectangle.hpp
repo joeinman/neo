@@ -2,36 +2,26 @@
 
 #include "component.hpp"
 
-namespace jsi
+namespace jsi::neo
 {
 
 class Rectangle : public Component
 {
 public:
-    Rectangle(int x, int y, int width, int height, const Color& color) :
-        x_(x), y_(y), width_(width), height_(height), color_(color)
+    Rectangle(std::shared_ptr<Scene> scene, int x, int y, int width, int height, const Color& color) :
+        Component(scene), x_(x), y_(y), width_(width), height_(height), color_(color)
     {}
 
-    void tick(const uint64_t& dt) override {}
+    void tick(const uint64_t& dt) override;
 
-    void render() override
-    {
-        for (int i = 0; i < height_; ++i)
-        {
-            for (int j = 0; j < width_; ++j)
-            {
-                // Assuming a hypothetical setPixel function to set the pixel color
-                // setPixel(x_ + j, y_ + i, color_);
-            }
-        }
-    }
+    void render() override;
 
 private:
-    int   x_;
-    int   y_;
-    int   width_;
-    int   height_;
-    Color color_;
+    Value<int>   x_;
+    Value<int>   y_;
+    Value<int>   width_;
+    Value<int>   height_;
+    Value<Color> color_;
 };
 
-}  // namespace jsi
+}  // namespace jsi::neo

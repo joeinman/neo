@@ -15,7 +15,7 @@
 #include <optional>
 #include <string>
 
-namespace jsi
+namespace jsi::neo
 {
 
 class PortList
@@ -50,4 +50,4 @@ private:
     static inline std::unordered_map<std::string, std::any> data_;
 };
 
-}  // namespace jsi
+}  // namespace jsi::neo

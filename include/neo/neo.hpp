@@ -16,7 +16,7 @@
 #include "neo/scene.hpp"
 #include "neo/screen.hpp"
 
-namespace jsi
+namespace jsi::neo
 {
 
 class Neo
@@ -60,4 +60,4 @@ private:
     MicrosFunction          micros_function_;
 };
 
-}  // namespace jsi
+}  // namespace jsi::neo

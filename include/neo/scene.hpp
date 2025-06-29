@@ -5,24 +5,31 @@
 
 #include "neo/component.hpp"
 #include "neo/portlist.hpp"
+#include <map>
 
-namespace jsi
+namespace jsi::neo
 {
 
 class Scene
 {
+    friend class Component;
+
 public:
     Scene()  = default;
     ~Scene() = default;
 
-    void addComponent(std::unique_ptr<Component> component) { components_.emplace_back(std::move(component)); }
-    std::vector<std::shared_ptr<Component>>& getComponents() { return components_; }
+    void addComponent(std::shared_ptr<Component> component)
+    {
+        auto id         = components_.size();
+        components_[id] = std::move(component);
+    }
+    std::map<uint64_t, std::shared_ptr<Component>>& getComponents() { return components_; }
 
     void tick(const uint64_t& dt)
     {
         for (auto& component : components_)
         {
-            component->tick(dt);
+            component.second->tick(dt);
         }
     }
 
@@ -34,9 +41,15 @@ public:
         port_list_.set(key, value);
     }
 
+    template <typename T>
+    inline std::optional<T> getPort(const std::string& key)
+    {
+        return port_list_.get<T>(key);
+    }
+
 private:
-    std::vector<std::shared_ptr<Component>> components_;
-    PortList                                port_list_;
+    std::map<uint64_t, std::shared_ptr<Component>> components_;
+    PortList                                       port_list_;
 };
 
-}  // namespace jsi
+}  // namespace jsi::neo
