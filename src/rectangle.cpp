@@ -1,4 +1,4 @@
-#include "neo/rectangle.hpp"
+#include "neo/component/rectangle.hpp"
 #include "neo/scene.hpp"
 #include "neo/screen.hpp"
 

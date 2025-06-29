@@ -3,7 +3,7 @@
 #include <vector>
 #include <memory>
 
-#include "neo/component.hpp"
+#include "neo/component/component.hpp"
 #include "neo/portlist.hpp"
 #include <map>
 
