@@ -9,17 +9,26 @@ void Rectangle::tick(const uint64_t& dt) {}
 
 void Rectangle::render()
 {
-    auto x =
-        std::holds_alternative<int>(x_) ? std::get<int>(x_) : scene_->getPort<int>(std::get<PortName>(x_)).value_or(0);
-    auto y =
-        std::holds_alternative<int>(y_) ? std::get<int>(y_) : scene_->getPort<int>(std::get<PortName>(y_)).value_or(0);
-    auto width  = std::holds_alternative<int>(width_) ? std::get<int>(width_)
-                                                      : scene_->getPort<int>(std::get<PortName>(width_)).value_or(0);
-    auto height = std::holds_alternative<int>(height_) ? std::get<int>(height_)
-                                                       : scene_->getPort<int>(std::get<PortName>(height_)).value_or(0);
-    auto color  = std::holds_alternative<Color>(color_)
-                      ? std::get<Color>(color_)
-                      : scene_->getPort<Color>(std::get<PortName>(color_)).value_or(Color(0, 0, 0, 0));
+    int x = properties_.isType<int>("x")
+                ? properties_.get<int>("x").value_or(0)
+                : scene_->getPort<int>(properties_.get<std::string>("x").value_or("")).value_or(0);
+
+    int y = properties_.isType<int>("y")
+                ? properties_.get<int>("y").value_or(0)
+                : scene_->getPort<int>(properties_.get<std::string>("y").value_or("")).value_or(0);
+
+    int width = properties_.isType<int>("width")
+                    ? properties_.get<int>("width").value_or(1)
+                    : scene_->getPort<int>(properties_.get<std::string>("width").value_or("")).value_or(1);
+
+    int height = properties_.isType<int>("height")
+                     ? properties_.get<int>("height").value_or(1)
+                     : scene_->getPort<int>(properties_.get<std::string>("height").value_or("")).value_or(1);
+
+    Color color =
+        properties_.isType<Color>("color")
+            ? properties_.get<Color>("color").value_or(Color(255, 255, 255))
+            : scene_->getPort<Color>(properties_.get<std::string>("color").value_or("")).value_or(Color(255, 255, 255));
 
     // Get screen from scene to draw on
     auto* screen = scene_->getScreen();

@@ -12,8 +12,11 @@
 
 #include <stdint.h>
 #include <memory>
+#include <map>
+#include <string>
 
 #include "neo/types.hpp"
+#include "neo/portlist.hpp"
 
 namespace jsi::neo
 {
@@ -29,6 +32,8 @@ public:
 
 protected:
     std::shared_ptr<Scene> scene_;
+    PortList               input_properties_;
+    PortList               output_properties_;
 };
 
 }  // namespace jsi::neo

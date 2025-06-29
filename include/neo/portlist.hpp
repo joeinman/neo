@@ -46,6 +46,17 @@ public:
         return std::nullopt;
     }
 
+    template <typename T>
+    inline bool isType(const std::string& key) const
+    {
+        auto it = data_.find(key);
+        if (it != data_.end())
+        {
+            return it->second.type() == typeid(T);
+        }
+        return false;
+    }
+
 private:
     static inline std::unordered_map<std::string, std::any> data_;
 };

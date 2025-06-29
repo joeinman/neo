@@ -14,9 +14,6 @@ using ShowFunction     = std::function<void()>;
 
 using PortName = std::string;
 
-template <typename T>
-using Value = std::variant<T, PortName>;
-
 struct ScreenSize
 {
     size_t width;
