@@ -28,7 +28,7 @@ public:
         screen_size_(screen_size),
         set_pixel_function_(set_pixel_function),
         show_function_(show_function),
-        pixel_buffer_(screen_size.height, std::vector<Color>(screen_size.width, Color(0, 0, 0, 0)))
+        pixel_buffer_(screen_size.height_, std::vector<Color>(screen_size.width_, Color(0, 0, 0, 0)))
     {}
     ~Screen() = default;
 
@@ -44,29 +44,44 @@ public:
         for (const auto& component : scene->getComponents())
         {
             auto [position, colors] = component.second->render();
-            int x                   = position.x;
-            int y                   = position.y;
+            auto x                  = position.x_;
+            auto y                  = position.y_;
 
-            for (int x_ = x; x_ < x + colors[0].size() && x_ < screen_size_.width; ++x_)
+            for (uint8_t x_ = x; x_ < x + colors[0].size() && x_ < screen_size_.width_; ++x_)
             {
-                for (int y_ = y; y_ < y + colors.size() && y_ < screen_size_.height; ++y_)
+                for (uint8_t y_ = y; y_ < y + colors.size() && y_ < screen_size_.height_; ++y_)
                 {
-                    if (x_ >= 0 && y_ >= 0)
+                    const Color& src = colors[y_ - y][x_ - x];
+                    Color&       dst = pixel_buffer_[y_][x_];
+
+                    if (src.a_ == 255)
                     {
-                        pixel_buffer_[y_][x_] = colors[y_ - y][x_ - x];
+                        dst = src;
+                    }
+                    else if (src.a_ > 0)
+                    {
+                        float source_alpha      = src.a_ / 255.0f;
+                        float destination_alpha = 1.0f - source_alpha;
+
+                        dst.r_ = static_cast<uint8_t>(src.r_ * source_alpha + dst.r_ * destination_alpha);
+                        dst.g_ = static_cast<uint8_t>(src.g_ * source_alpha + dst.g_ * destination_alpha);
+                        dst.b_ = static_cast<uint8_t>(src.b_ * source_alpha + dst.b_ * destination_alpha);
+                        dst.a_ = static_cast<uint8_t>(255 - ((255 - src.a_) * (255 - dst.a_) / 255));
                     }
                 }
             }
         }
 
         // Render Pixel Buffer
-        for (size_t y = 0; y < screen_size_.height; ++y)
+        for (size_t y = 0; y < screen_size_.height_; ++y)
         {
-            for (size_t x = 0; x < screen_size_.width; ++x)
+            for (size_t x = 0; x < screen_size_.width_; ++x)
             {
                 const Color& color = pixel_buffer_[y][x];
-                auto         white = color.a == 0 ? 0 : 255;
-                set_pixel_function_(x, color.r, color.g, color.b, white);
+                uint8_t      r     = static_cast<uint8_t>((static_cast<float>(color.r_) * color.a_) / 255.0f);
+                uint8_t      g     = static_cast<uint8_t>((static_cast<float>(color.g_) * color.a_) / 255.0f);
+                uint8_t      b     = static_cast<uint8_t>((static_cast<float>(color.b_) * color.a_) / 255.0f);
+                set_pixel_function_(x, r, g, b, color.a_);
             }
         }
         show_function_();

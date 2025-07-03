@@ -16,27 +16,27 @@ using PortName = std::string;
 
 struct ScreenSize
 {
-    size_t width;
-    size_t height;
+    size_t width_;
+    size_t height_;
 
-    ScreenSize(size_t w, size_t h) : width(w), height(h) {}
+    ScreenSize(size_t width, size_t height) : width_(width), height_(height) {}
 };
 
 struct Color
 {
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-    uint8_t a;
+    uint8_t r_;
+    uint8_t g_;
+    uint8_t b_;
+    uint8_t a_;
 
-    Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) : r(r), g(g), b(b), a(a) {}
-    Color(uint8_t r, uint8_t g, uint8_t b) : r(r), g(g), b(b), a(255) {}
+    Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) : r_(r), g_(g), b_(b), a_(a) {}
+    Color(uint8_t r, uint8_t g, uint8_t b) : r_(r), g_(g), b_(b), a_(255) {}
 };
 
 struct Position
 {
-    int x;
-    int y;
+    uint8_t x_;
+    uint8_t y_;
 };
 
 }  // namespace jsi::neo

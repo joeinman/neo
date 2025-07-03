@@ -23,7 +23,9 @@ class Component
 {
 public:
     Component() {}
-    virtual void                                                 tick(const uint64_t& dt) {}
+    virtual ~Component() = default;
+
+    virtual void                                                 tick(const uint64_t& /*dt*/) {}
     virtual std::pair<Position, std::vector<std::vector<Color>>> render() = 0;
 
     template <typename T>
