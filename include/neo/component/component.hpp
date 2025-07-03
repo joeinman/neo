@@ -23,8 +23,8 @@ class Component
 {
 public:
     Component() {}
-    virtual void                                                 tick(const uint64_t& dt) = 0;
-    virtual std::pair<Position, std::vector<std::vector<Color>>> render()                 = 0;
+    virtual void                                                 tick(const uint64_t& dt) {}
+    virtual std::pair<Position, std::vector<std::vector<Color>>> render() = 0;
 
     template <typename T>
     std::optional<T> getProperty(const std::string& key) const

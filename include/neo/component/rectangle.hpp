@@ -25,19 +25,7 @@ public:
         properties_.set<int>("width", width);
         properties_.set<int>("height", height);
         properties_.set<Color>("color", color);
-
-        printf("Rectangle created at (%d, %d) with size (%d, %d) and color (%d, %d, %d, %d)\n",
-               x,
-               y,
-               width,
-               height,
-               color.r,
-               color.g,
-               color.b,
-               color.a);
     }
-
-    void tick(const uint64_t& dt) override;
 
     std::pair<Position, std::vector<std::vector<Color>>> render() override;
 };

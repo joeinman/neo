@@ -5,8 +5,6 @@
 namespace jsi::neo
 {
 
-void Rectangle::tick(const uint64_t& dt) {}
-
 std::pair<Position, std::vector<std::vector<Color>>> Rectangle::render()
 {
     int   x      = properties_.get<int>("x").value_or(0);
