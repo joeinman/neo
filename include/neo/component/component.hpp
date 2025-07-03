@@ -11,6 +11,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <string>
 
 #include "neo/portlist.hpp"
 #include "neo/types.hpp"
@@ -24,6 +25,22 @@ public:
     Component() {}
     virtual void                                                 tick(const uint64_t& dt) = 0;
     virtual std::pair<Position, std::vector<std::vector<Color>>> render()                 = 0;
+
+    template <typename T>
+    std::optional<T> getProperty(const std::string& key) const
+    {
+        return properties_.get<T>(key);
+    }
+
+    template <typename T>
+    void setProperty(const std::string& key, const T& value)
+    {
+        auto res = properties_.get<T>(key);
+        if (res.has_value())
+        {
+            properties_.set<T>(key, value);
+        }
+    }
 
 protected:
     PortList properties_;

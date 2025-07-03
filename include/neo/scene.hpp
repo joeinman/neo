@@ -28,7 +28,30 @@ public:
         components_[id]    = std::move(component);
         return id;
     }
+
     std::map<uint64_t, std::shared_ptr<Component>>& getComponents() { return components_; }
+
+    std::shared_ptr<Component> getComponent(uint64_t id)
+    {
+        auto it = components_.find(id);
+        if (it != components_.end())
+        {
+            return it->second;
+        }
+        return nullptr;
+    }
+
+    template <typename T>
+    bool setComponentProperty(uint64_t id, const std::string& key, const T& value)
+    {
+        auto component = getComponent(id);
+        if (component)
+        {
+            component->setProperty<T>(key, value);
+            return true;
+        }
+        return false;
+    }
 
     void tick(const uint64_t& dt)
     {

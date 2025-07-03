@@ -31,7 +31,7 @@ public:
     }
 
     template <typename T>
-    inline std::optional<T> get(const std::string& key)
+    inline std::optional<T> get(const std::string& key) const
     {
         auto it = data_.find(key);
         if (it != data_.end())
