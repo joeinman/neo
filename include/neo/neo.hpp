@@ -44,19 +44,7 @@ public:
         screen_->render(scene_);
     }
 
-    void loadScene(std::shared_ptr<Scene> scene) noexcept 
-    { 
-        scene_ = std::move(scene); 
-        scene_->setScreen(screen_.get());
-    }
-
-    void runTrigger(const std::string& trigger_name) noexcept { scene_->runTrigger(trigger_name); }
-
-    template <typename T>
-    inline void setPort(const std::string& key, const T& value) noexcept
-    {
-        scene_->setPort(key, value);
-    }
+    void loadScene(std::shared_ptr<Scene> scene) noexcept { scene_ = std::move(scene); }
 
 private:
     std::unique_ptr<Screen> screen_;

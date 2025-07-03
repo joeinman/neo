@@ -58,7 +58,7 @@ public:
     }
 
 private:
-    static inline std::unordered_map<std::string, std::any> data_;
+    std::unordered_map<std::string, std::any> data_;
 };
 
 }  // namespace jsi::neo
