@@ -31,11 +31,11 @@ public:
 
     std::pair<Position, PixelBuffer> render() override
     {
-        auto x      = properties_.get<uint8_t>("x").value_or(0);
-        auto y      = properties_.get<uint8_t>("y").value_or(0);
-        auto width  = properties_.get<uint8_t>("width").value_or(1);
-        auto height = properties_.get<uint8_t>("height").value_or(1);
-        auto color  = properties_.get<Color>("color").value_or(Color(255, 255, 255));
+        auto x      = properties_.get<uint8_t>("x").value();
+        auto y      = properties_.get<uint8_t>("y").value();
+        auto width  = properties_.get<uint8_t>("width").value();
+        auto height = properties_.get<uint8_t>("height").value();
+        auto color  = properties_.get<Color>("color").value();
 
         return {{x, y}, PixelBuffer(height, std::vector<Color>(width, color))};
     }
