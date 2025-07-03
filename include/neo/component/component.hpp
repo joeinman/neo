@@ -25,8 +25,11 @@ public:
     Component() {}
     virtual ~Component() = default;
 
-    virtual void                                                 tick(const uint64_t& /*dt*/) {}
-    virtual std::pair<Position, PixelBuffer> render() = 0;
+    virtual void                             tick(uint64_t /*time_us*/) {}
+    virtual std::pair<Position, PixelBuffer> render()
+    {
+        return {{0, 0}, PixelBuffer(1, std::vector<Color>(1, Color(0, 0, 0, 0)))};
+    }
 
     template <typename T>
     std::optional<T> getProperty(const std::string& key) const
@@ -44,8 +47,15 @@ public:
         }
     }
 
+    template <typename T>
+    std::optional<T> getOutput(const std::string& key) const
+    {
+        return outputs_.get<T>(key);
+    }
+
 protected:
     PortList properties_;
+    PortList outputs_;
 };
 
 }  // namespace jsi::neo

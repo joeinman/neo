@@ -53,11 +53,11 @@ public:
         return false;
     }
 
-    void tick(const uint64_t& dt)
+    void tick(uint64_t time_us)
     {
         for (auto& component : components_)
         {
-            component.second->tick(dt);
+            component.second->tick(time_us);
         }
     }
 

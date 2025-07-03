@@ -27,8 +27,6 @@ public:
         properties_.set<Color>("color", color);
     }
 
-    virtual ~Rectangle() = default;
-
     std::pair<Position, PixelBuffer> render() override
     {
         auto x      = properties_.get<uint8_t>("x").value();
