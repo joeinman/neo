@@ -53,14 +53,23 @@ public:
             value = (sin(2.0 * M_PI * frequency * time_sec) >= 0) ? 1.0 : 0.0;
             break;
         case WaveformType::kTriangle:
-            value = (2.0 / M_PI) * asin(sin(2.0 * M_PI * frequency * time_sec));
+        {
+            double phase = fmod(frequency * time_sec, 1.0);
+            if (phase < 0.5)
+            {
+                value = phase * 2.0;
+            }
+            else
+            {
+                value = 2.0 - (phase * 2.0);
+            }
             break;
+        }
         case WaveformType::kSawtooth:
             value = fmod(frequency * time_sec, 1.0);
             break;
         }
 
-        printf("Waveform Value: %f\n", value);
         outputs_.set<double>("waveform_value", value);
     }
 };
