@@ -59,17 +59,16 @@ public:
             }
         }
 
-        // Set Pixels
+        // Render Pixel Buffer
         for (size_t y = 0; y < screen_size_.height; ++y)
         {
             for (size_t x = 0; x < screen_size_.width; ++x)
             {
                 const Color& color = pixel_buffer_[y][x];
-                set_pixel_function_(x, color.r, color.g, color.b, color.a);
+                auto         white = color.a == 0 ? 0 : 255;
+                set_pixel_function_(x, color.r, color.g, color.b, white);
             }
         }
-
-        // Show the pixels
         show_function_();
     }
 
