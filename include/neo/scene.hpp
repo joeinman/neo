@@ -18,7 +18,7 @@ class Scene : public std::enable_shared_from_this<Scene>
 
 public:
     Scene()  = default;
-    ~Scene() = default;
+    virtual ~Scene() = default;
 
     template <typename T, typename... Args>
     uint64_t addComponent(Args&&... args)
@@ -53,7 +53,7 @@ public:
         return false;
     }
 
-    void tick(uint64_t time_us)
+    virtual void tick(uint64_t time_us)
     {
         for (auto& component : components_)
         {
