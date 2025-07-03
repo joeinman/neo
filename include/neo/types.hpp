@@ -39,4 +39,6 @@ struct Position
     uint8_t y_;
 };
 
+using PixelBuffer = std::vector<std::vector<Color>>;
+
 }  // namespace jsi::neo

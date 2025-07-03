@@ -88,10 +88,10 @@ public:
     }
 
 private:
-    ScreenSize                      screen_size_;
-    SetPixelFunction                set_pixel_function_;
-    ShowFunction                    show_function_;
-    std::vector<std::vector<Color>> pixel_buffer_;
+    ScreenSize       screen_size_;
+    SetPixelFunction set_pixel_function_;
+    ShowFunction     show_function_;
+    PixelBuffer      pixel_buffer_;
 };
 
 }  // namespace jsi::neo

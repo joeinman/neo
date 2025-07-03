@@ -29,7 +29,7 @@ public:
 
     virtual ~Rectangle() = default;
 
-    std::pair<Position, std::vector<std::vector<Color>>> render() override
+    std::pair<Position, PixelBuffer> render() override
     {
         auto x      = properties_.get<uint8_t>("x").value_or(0);
         auto y      = properties_.get<uint8_t>("y").value_or(0);
@@ -37,7 +37,7 @@ public:
         auto height = properties_.get<uint8_t>("height").value_or(1);
         auto color  = properties_.get<Color>("color").value_or(Color(255, 255, 255));
 
-        return {{x, y}, std::vector<std::vector<Color>>(height, std::vector<Color>(width, color))};
+        return {{x, y}, PixelBuffer(height, std::vector<Color>(width, color))};
     }
 };
 
