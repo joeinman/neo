@@ -36,25 +36,26 @@ public:
         properties_.set<double>("output_value", 0.0);
     }
 
-    void tick(uint64_t time_us) override
+    void tick(uint64_t dt) override
     {
         auto frequency = properties_.get<double>("frequency").value();
         auto type      = properties_.get<WaveformType>("waveform_type").value();
 
-        double time_sec = static_cast<double>(time_us) * 1e-6;
+        // double time_sec_ = static_cast<double>(time_us) * 1e-6;
+        time_sec_ += static_cast<double>(dt) * 1e-6;  // Convert dt from microseconds to seconds
         double value;
 
         switch (type)
         {
         case WaveformType::kSine:
-            value = 0.5 * (sin(2.0 * M_PI * frequency * time_sec) + 1.0);
+            value = 0.5 * (sin(2.0 * M_PI * frequency * time_sec_) + 1.0);
             break;
         case WaveformType::kSquare:
-            value = (sin(2.0 * M_PI * frequency * time_sec) >= 0) ? 1.0 : 0.0;
+            value = (sin(2.0 * M_PI * frequency * time_sec_) >= 0) ? 1.0 : 0.0;
             break;
         case WaveformType::kTriangle:
         {
-            double phase = fmod(frequency * time_sec, 1.0);
+            double phase = fmod(frequency * time_sec_, 1.0);
             if (phase < 0.5)
             {
                 value = phase * 2.0;
@@ -66,12 +67,15 @@ public:
             break;
         }
         case WaveformType::kSawtooth:
-            value = fmod(frequency * time_sec, 1.0);
+            value = fmod(frequency * time_sec_, 1.0);
             break;
         }
 
         properties_.set<double>("output_value", value);
     }
+
+private:
+    double time_sec_ = 0.0;
 };
 
 }  // namespace jsi::neo

@@ -35,10 +35,8 @@ public:
         target_key_(target_key)
     {}
 
-    void tick(uint64_t time_us) override
+    void tick(uint64_t /*dt*/) override
     {
-        Component::tick(time_us);
-
         auto source_value = source_component_->getProperty<SourceType>(source_key_);
         if (source_value.has_value())
         {

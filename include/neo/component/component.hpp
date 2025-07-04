@@ -25,7 +25,7 @@ public:
     Component(uint8_t z_index = 0) { properties_.set<uint8_t>("z_index", z_index); }
     virtual ~Component() = default;
 
-    virtual void                             tick(uint64_t /*time_us*/) {}
+    virtual void                             tick(uint64_t /*dt*/) {}
     virtual std::pair<Position, PixelBuffer> render()
     {
         return {{0, 0}, PixelBuffer(1, std::vector<Color>(1, Color(0, 0, 0, 0)))};

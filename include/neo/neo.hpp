@@ -35,7 +35,12 @@ public:
 
     void spin() noexcept
     {
-        scene_->tick(micros_function_());
+        static uint64_t last_tick    = 0;
+        uint64_t        current_tick = micros_function_();
+        uint64_t        dt           = current_tick - last_tick;
+        last_tick                    = current_tick;
+
+        scene_->tick(dt);
         screen_->render(scene_);
     }
 
