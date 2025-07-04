@@ -35,8 +35,8 @@ struct Color
 
 struct Position
 {
-    uint8_t x_;
-    uint8_t y_;
+    int16_t x_;
+    int16_t y_;
 };
 
 using PixelBuffer = std::vector<std::vector<Color>>;
