@@ -40,11 +40,7 @@ public:
     template <typename T>
     void setProperty(const std::string& key, const T& value)
     {
-        auto res = properties_.get<T>(key);
-        if (res.has_value())
-        {
-            properties_.set<T>(key, value);
-        }
+        properties_.set<T>(key, value);
     }
 
     template <typename T>

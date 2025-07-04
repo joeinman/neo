@@ -18,6 +18,7 @@
 
 #include <neo/component/rectangle.hpp>
 #include <neo/component/waveform_generator.hpp>
+#include <neo/component/algebra_unit.hpp>
 
 namespace jsi::neo
 {

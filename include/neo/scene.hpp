@@ -79,28 +79,6 @@ public:
         return 0;
     }
 
-    template <typename SourceType, typename TargetType>
-    uint64_t connectComponentProperty(uint64_t                              source_id,
-                                      const std::string&                    source_key,
-                                      uint64_t                              target_id,
-                                      const std::string&                    target_key,
-                                      std::function<TargetType(SourceType)> transformer)
-    {
-        auto source_component = getComponent(source_id);
-        auto target_component = getComponent(target_id);
-
-        if (source_component && target_component)
-        {
-            return addComponent<TransformedPropertyBinding<SourceType, TargetType>>(source_component,
-                                                                                    source_key,
-                                                                                    target_component,
-                                                                                    target_key,
-                                                                                    transformer);
-        }
-
-        return 0;
-    }
-
 private:
     std::map<uint64_t, std::shared_ptr<Component>> components_;
 };
