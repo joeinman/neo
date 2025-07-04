@@ -46,6 +46,8 @@ public:
 
     void loadScene(std::shared_ptr<Scene> scene) noexcept { scene_ = std::move(scene); }
 
+    std::shared_ptr<Scene> getScene() const noexcept { return scene_; }
+
 private:
     std::unique_ptr<Screen> screen_;
     std::shared_ptr<Scene>  scene_ = std::make_shared<Scene>();

@@ -55,22 +55,29 @@ public:
                      TransitionType     transition_type    = TransitionType::kNone,
                      uint64_t           transition_time_us = 1000000)
     {
-        auto it = transitions_.find(key);
-        if (it != transitions_.end())
+        if (transition_type == TransitionType::kNone)
         {
-            // Update existing transition
-            it->second = Transition(properties_.get<uint8_t>(key).value_or(uint8_t()),
-                                    value,
-                                    transition_type,
-                                    transition_time_us);
+            properties_.set<T>(key, value);
         }
         else
         {
-            transitions_.emplace(key,
-                                 Transition(properties_.get<uint8_t>(key).value_or(uint8_t()),
-                                            value,
-                                            transition_type,
-                                            transition_time_us));
+            auto it = transitions_.find(key);
+            if (it != transitions_.end())
+            {
+                // Update existing transition
+                it->second = Transition(properties_.get<uint8_t>(key).value_or(uint8_t()),
+                                        value,
+                                        transition_type,
+                                        transition_time_us);
+            }
+            else
+            {
+                transitions_.emplace(key,
+                                     Transition(properties_.get<uint8_t>(key).value_or(uint8_t()),
+                                                value,
+                                                transition_type,
+                                                transition_time_us));
+            }
         }
     }
 
