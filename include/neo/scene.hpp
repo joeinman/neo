@@ -1,30 +1,21 @@
-/*
- * Copyright (c) 2025, Joe Inman
- *
- * Licensed under the MIT License.
- * You may obtain a copy of the License at:
- *     https://opensource.org/licenses/MIT
- *
- * This file is part of the Neo Library.
- */
-
 #pragma once
 
-#include <functional>
 #include <vector>
 #include <memory>
 #include <queue>
-#include <map>
+#include <functional>
 
-#include "neo/component/property_binding.hpp"
 #include "neo/component/component.hpp"
+#include "neo/component/property_binding.hpp"
 #include "neo/portlist.hpp"
+#include <map>
 
 namespace jsi::neo
 {
 
 class Scene
 {
+    // Comparator for component z-index sorting
     struct ComponentZIndexComparator
     {
         bool operator()(const std::pair<uint64_t, std::shared_ptr<Component>>& a,
@@ -85,12 +76,16 @@ public:
     }
 
     template <typename T>
-    bool setComponentProperty(uint64_t id, const std::string& key, const T& value)
+    bool setComponentProperty(uint64_t           id,
+                              const std::string& key,
+                              const T&           value,
+                              TransitionType     transition_type    = TransitionType::kNone,
+                              uint64_t           transition_time_us = 1000000)
     {
         auto component = getComponent(id);
         if (component)
         {
-            component->setProperty<T>(key, value);
+            component->setProperty<T>(key, value, transition_type, transition_time_us);
             return true;
         }
         return false;
@@ -105,10 +100,10 @@ public:
     }
 
     template <typename SourceType, typename TargetType = SourceType>
-    uint64_t connectProperties(uint64_t           source_id,
-                               const std::string& source_key,
-                               uint64_t           target_id,
-                               const std::string& target_key)
+    uint64_t connectComponentProperty(uint64_t           source_id,
+                                      const std::string& source_key,
+                                      uint64_t           target_id,
+                                      const std::string& target_key)
     {
         auto source_component = getComponent(source_id);
         auto target_component = getComponent(target_id);
