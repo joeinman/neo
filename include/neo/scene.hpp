@@ -91,6 +91,17 @@ public:
         return false;
     }
 
+    template <typename T>
+    std::optional<T> getComponentProperty(uint64_t id, const std::string& key)
+    {
+        auto component = getComponent(id);
+        if (component)
+        {
+            return component->getProperty<T>(key);
+        }
+        return std::nullopt;
+    }
+
     virtual void tick(uint64_t time_us)
     {
         for (auto& [id, component] : component_lookup_)
@@ -100,10 +111,10 @@ public:
     }
 
     template <typename SourceType, typename TargetType = SourceType>
-    uint64_t connectComponentProperty(uint64_t           source_id,
-                                      const std::string& source_key,
-                                      uint64_t           target_id,
-                                      const std::string& target_key)
+    uint64_t connectProperties(uint64_t           source_id,
+                               const std::string& source_key,
+                               uint64_t           target_id,
+                               const std::string& target_key)
     {
         auto source_component = getComponent(source_id);
         auto target_component = getComponent(target_id);
