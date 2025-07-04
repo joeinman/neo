@@ -32,6 +32,7 @@ public:
     {
         properties_.set<double>("frequency", frequency);
         properties_.set<WaveformType>("waveform_type", waveform_type);
+        properties_.set<bool>("enabled", true);
 
         properties_.set<double>("output_value", 0.0);
     }
@@ -40,9 +41,13 @@ public:
     {
         auto frequency = properties_.get<double>("frequency").value();
         auto type      = properties_.get<WaveformType>("waveform_type").value();
+        auto enabled   = properties_.get<bool>("enabled").value_or(true);
 
-        // double time_sec_ = static_cast<double>(time_us) * 1e-6;
-        time_sec_ += static_cast<double>(dt) * 1e-6;  // Convert dt from microseconds to seconds
+        if (enabled)
+        {
+            time_sec_ += static_cast<double>(dt) * 1e-6;
+        }
+        
         double value;
 
         switch (type)
