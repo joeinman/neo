@@ -33,12 +33,14 @@ public:
         source_key_(source_key),
         target_component_(target_component),
         target_key_(target_key)
-    {}
+    {
+        properties_.set<bool>("enabled", true);
+    }
 
     void tick(uint64_t /*dt*/) override
     {
         auto source_value = source_component_->getProperty<SourceType>(source_key_);
-        if (source_value.has_value())
+        if (source_value.has_value() && properties_.get<bool>("enabled").value_or(true))
         {
             target_component_->setProperty<TargetType>(target_key_, static_cast<TargetType>(source_value.value()));
         }
