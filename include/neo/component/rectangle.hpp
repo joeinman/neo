@@ -31,18 +31,23 @@ public:
         properties_.set<uint8_t>("b", color.b_);
         properties_.set<uint8_t>("a", color.a_);
         properties_.set<bool>("visible", true);
+        properties_.set<float>("opacity", 1.0f);
     }
 
     std::pair<Position, PixelBuffer> render() override
     {
-        auto x      = properties_.get<int16_t>("x").value();
-        auto y      = properties_.get<int16_t>("y").value();
-        auto width  = properties_.get<uint16_t>("width").value();
-        auto height = properties_.get<uint16_t>("height").value();
-        auto color  = Color(properties_.get<uint8_t>("r").value(),
-                           properties_.get<uint8_t>("g").value(),
-                           properties_.get<uint8_t>("b").value(),
-                           properties_.get<uint8_t>("a").value());
+        auto x       = properties_.get<int16_t>("x").value();
+        auto y       = properties_.get<int16_t>("y").value();
+        auto width   = properties_.get<uint16_t>("width").value();
+        auto height  = properties_.get<uint16_t>("height").value();
+        auto opacity = properties_.get<float>("opacity").value_or(1.0f);
+        
+        auto r = properties_.get<uint8_t>("r").value();
+        auto g = properties_.get<uint8_t>("g").value();
+        auto b = properties_.get<uint8_t>("b").value();
+        auto a = static_cast<uint8_t>(properties_.get<uint8_t>("a").value() * opacity);
+        
+        auto color = Color(r, g, b, a);
 
         if (properties_.get<bool>("visible").value_or(true) && width > 0 && height > 0)
         {

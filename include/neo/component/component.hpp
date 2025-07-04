@@ -14,6 +14,9 @@
 #include <string>
 #include <map>
 #include <memory>
+#include <variant>
+#include <any>
+#include <typeindex>
 
 #include "neo/portlist.hpp"
 #include "neo/types.hpp"
@@ -21,6 +24,41 @@
 
 namespace jsi::neo
 {
+
+// Forward declaration for the transition wrapper
+class TransitionBase {
+public:
+    virtual ~TransitionBase() = default;
+    virtual void tick(uint64_t dt) = 0;
+    virtual bool isCompleted() const = 0;
+    virtual std::any getCurrentValue() const = 0;
+    virtual std::type_index getType() const = 0;
+};
+
+template <typename T>
+class TransitionWrapper : public TransitionBase {
+public:
+    TransitionWrapper(Transition<T> transition) : transition_(std::move(transition)) {}
+
+    void tick(uint64_t dt) override {
+        transition_.tick(dt);
+    }
+
+    bool isCompleted() const override {
+        return transition_.getState() == TransitionState::kCompleted;
+    }
+
+    std::any getCurrentValue() const override {
+        return transition_.getCurrentValue();
+    }
+    
+    std::type_index getType() const override {
+        return typeid(T);
+    }
+
+private:
+    Transition<T> transition_;
+};
 
 class Component
 {
@@ -30,12 +68,40 @@ public:
 
     virtual void tick(uint64_t time_us)
     {
+        std::vector<std::string> completed_keys;
+        
         for (auto& [key, transition] : transitions_)
         {
-            transition.tick(time_us);
-            properties_.set<uint8_t>(key, transition.getCurrentValue());
+            transition->tick(time_us);
+            
+            if (transition->isCompleted()) {
+                completed_keys.push_back(key);
+            } else {
+                std::type_index type = transition->getType();
+                std::any value = transition->getCurrentValue();
+                
+                // Set the property with the appropriate type
+                if (type == typeid(uint8_t)) {
+                    properties_.set<uint8_t>(key, std::any_cast<uint8_t>(value));
+                } else if (type == typeid(int16_t)) {
+                    properties_.set<int16_t>(key, std::any_cast<int16_t>(value));
+                } else if (type == typeid(int)) {
+                    properties_.set<int>(key, std::any_cast<int>(value));
+                } else if (type == typeid(float)) {
+                    properties_.set<float>(key, std::any_cast<float>(value));
+                } else if (type == typeid(double)) {
+                    properties_.set<double>(key, std::any_cast<double>(value));
+                } else if (type == typeid(bool)) {
+                    properties_.set<bool>(key, std::any_cast<bool>(value));
+                }
+                // Add more types as needed
+            }
         }
-        std::erase_if(transitions_, [](auto const& kv) { return kv.second.getState() == TransitionState::kCompleted; });
+        
+        // Remove completed transitions
+        for (const auto& key : completed_keys) {
+            transitions_.erase(key);
+        }
     }
 
     virtual std::pair<Position, PixelBuffer> render()
@@ -61,29 +127,22 @@ public:
         }
         else
         {
-            auto it = transitions_.find(key);
-            if (it != transitions_.end())
-            {
-                // Update existing transition
-                it->second = Transition(properties_.get<uint8_t>(key).value_or(uint8_t()),
-                                        value,
-                                        transition_type,
-                                        transition_time_us);
-            }
-            else
-            {
-                transitions_.emplace(key,
-                                     Transition(properties_.get<uint8_t>(key).value_or(uint8_t()),
-                                                value,
-                                                transition_type,
-                                                transition_time_us));
-            }
+            // Get the current value, or use default if it doesn't exist
+            auto current_value = properties_.get<T>(key).value_or(T{});
+            
+            // Create a new transition
+            auto transition = std::make_unique<TransitionWrapper<T>>(
+                Transition<T>(current_value, value, transition_type, transition_time_us)
+            );
+            
+            // Store the transition
+            transitions_[key] = std::move(transition);
         }
     }
 
 protected:
-    PortList                          properties_;
-    std::map<std::string, Transition> transitions_;
+    PortList properties_;
+    std::map<std::string, std::unique_ptr<TransitionBase>> transitions_;
 };
 
 }  // namespace jsi::neo
