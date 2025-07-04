@@ -30,6 +30,7 @@ public:
         properties_.set<uint8_t>("g", color.g_);
         properties_.set<uint8_t>("b", color.b_);
         properties_.set<uint8_t>("a", color.a_);
+        properties_.set<bool>("visible", true);
     }
 
     std::pair<Position, PixelBuffer> render() override
@@ -43,7 +44,11 @@ public:
                            properties_.get<uint8_t>("b").value(),
                            properties_.get<uint8_t>("a").value());
 
-        return {{x, y}, PixelBuffer(height, std::vector<Color>(width, color))};
+        if (properties_.get<bool>("visible").value_or(true) && width > 0 && height > 0)
+        {
+            return {{x, y}, PixelBuffer(height, std::vector<Color>(width, color))};
+        }
+        return {{x, y}, PixelBuffer(1, std::vector<Color>(1, Color(0, 0, 0, 0)))};
     }
 };
 
