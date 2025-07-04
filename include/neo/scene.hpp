@@ -2,6 +2,8 @@
 
 #include <vector>
 #include <memory>
+#include <queue>
+#include <functional>
 
 #include "neo/component/component.hpp"
 #include "neo/component/property_binding.hpp"
@@ -11,11 +13,27 @@
 namespace jsi::neo
 {
 
-class Screen;
-
-class Scene : public std::enable_shared_from_this<Scene>
+class Scene
 {
-    friend class Component;
+    // Comparator for component z-index sorting
+    struct ComponentZIndexComparator
+    {
+        bool operator()(const std::pair<uint64_t, std::shared_ptr<Component>>& a,
+                        const std::pair<uint64_t, std::shared_ptr<Component>>& b) const
+        {
+            // First compare by z-index
+            uint8_t z_index_a = a.second->getProperty<uint8_t>("z_index").value_or(0);
+            uint8_t z_index_b = b.second->getProperty<uint8_t>("z_index").value_or(0);
+
+            if (z_index_a != z_index_b)
+            {
+                return z_index_a > z_index_b;  // Lower z_index rendered first (appears at the back)
+            }
+
+            // If z-indexes are equal, sort by ID for stable ordering
+            return a.first > b.first;
+        }
+    };
 
 public:
     Scene()          = default;
@@ -25,17 +43,32 @@ public:
     uint64_t addComponent(Args&&... args)
     {
         auto     component = std::make_shared<T>(std::forward<Args>(args)...);
-        uint64_t id        = components_.size();
-        components_[id]    = std::move(component);
+        uint64_t id        = next_id_++;
+
+        components_.push(std::make_pair(id, component));
+        component_lookup_[id] = component;
+
         return id;
     }
 
-    std::map<uint64_t, std::shared_ptr<Component>>& getComponents() { return components_; }
+    std::vector<std::pair<uint64_t, std::shared_ptr<Component>>> getComponentsInZOrder() const
+    {
+        std::vector<std::pair<uint64_t, std::shared_ptr<Component>>> sorted_components;
+
+        auto queue_copy = components_;
+        while (!queue_copy.empty())
+        {
+            sorted_components.push_back(queue_copy.top());
+            queue_copy.pop();
+        }
+
+        return sorted_components;
+    }
 
     std::shared_ptr<Component> getComponent(uint64_t id)
     {
-        auto it = components_.find(id);
-        if (it != components_.end())
+        auto it = component_lookup_.find(id);
+        if (it != component_lookup_.end())
         {
             return it->second;
         }
@@ -56,9 +89,9 @@ public:
 
     virtual void tick(uint64_t time_us)
     {
-        for (auto& component : components_)
+        for (auto& [id, component] : component_lookup_)
         {
-            component.second->tick(time_us);
+            component->tick(time_us);
         }
     }
 
@@ -80,7 +113,16 @@ public:
     }
 
 private:
-    std::map<uint64_t, std::shared_ptr<Component>> components_;
+    // Map for fast component lookup by ID
+    std::map<uint64_t, std::shared_ptr<Component>> component_lookup_;
+
+    // Priority queue for z-index sorted components
+    std::priority_queue<std::pair<uint64_t, std::shared_ptr<Component>>,
+                        std::vector<std::pair<uint64_t, std::shared_ptr<Component>>>,
+                        ComponentZIndexComparator>
+        components_;
+
+    uint64_t next_id_ = 0;
 };
 
 }  // namespace jsi::neo

@@ -40,10 +40,10 @@ public:
             std::fill(row.begin(), row.end(), Color(0, 0, 0, 0));
         }
 
-        // Draw All Components
-        for (const auto& component : scene->getComponents())
+        // Draw All Components In Z-Index Order
+        for (const auto& [_, component] : scene->getComponentsInZOrder())
         {
-            auto [position, colors] = component.second->render();
+            auto [position, colors] = component->render();
             auto x                  = position.x_;
             auto y                  = position.y_;
 
