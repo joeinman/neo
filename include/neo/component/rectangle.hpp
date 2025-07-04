@@ -24,7 +24,11 @@ public:
         properties_.set<uint8_t>("y", y);
         properties_.set<uint8_t>("width", width);
         properties_.set<uint8_t>("height", height);
-        properties_.set<Color>("color", color);
+
+        properties_.set<uint8_t>("r", color.r_);
+        properties_.set<uint8_t>("g", color.g_);
+        properties_.set<uint8_t>("b", color.b_);
+        properties_.set<uint8_t>("a", color.a_);
     }
 
     std::pair<Position, PixelBuffer> render() override
@@ -33,7 +37,10 @@ public:
         auto y      = properties_.get<uint8_t>("y").value();
         auto width  = properties_.get<uint8_t>("width").value();
         auto height = properties_.get<uint8_t>("height").value();
-        auto color  = properties_.get<Color>("color").value();
+        auto color  = Color(properties_.get<uint8_t>("r").value(),
+                           properties_.get<uint8_t>("g").value(),
+                           properties_.get<uint8_t>("b").value(),
+                           properties_.get<uint8_t>("a").value());
 
         return {{x, y}, PixelBuffer(height, std::vector<Color>(width, color))};
     }

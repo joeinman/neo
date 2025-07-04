@@ -33,7 +33,7 @@ public:
         properties_.set<double>("frequency", frequency);
         properties_.set<WaveformType>("waveform_type", waveform_type);
 
-        outputs_.set<double>("waveform_value", 0.0);
+        outputs_.set<double>("output_value", 0.0);
     }
 
     void tick(uint64_t time_us) override
@@ -70,7 +70,7 @@ public:
             break;
         }
 
-        outputs_.set<double>("waveform_value", value);
+        outputs_.set<double>("output_value", value);
     }
 };
 
