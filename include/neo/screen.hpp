@@ -47,12 +47,41 @@ public:
             auto x                  = position.x_;
             auto y                  = position.y_;
 
-            for (uint8_t x_ = x; x_ < x + colors[0].size() && x_ < screen_size_.width_; ++x_)
+            // Calculate visible region of component
+            int component_width  = static_cast<int>(colors.empty() ? 0 : colors[0].size());
+            int component_height = static_cast<int>(colors.size());
+
+            // Skip if component is entirely outside the screen
+            if (x >= static_cast<int>(screen_size_.width_) || y >= static_cast<int>(screen_size_.height_) ||
+                x + component_width <= 0 || y + component_height <= 0)
             {
-                for (uint8_t y_ = y; y_ < y + colors.size() && y_ < screen_size_.height_; ++y_)
+                continue;
+            }
+
+            // Calculate visible area of component
+            int start_x = std::max(0, static_cast<int>(x));
+            int start_y = std::max(0, static_cast<int>(y));
+            int end_x   = std::min(static_cast<int>(screen_size_.width_), static_cast<int>(x) + component_width);
+            int end_y   = std::min(static_cast<int>(screen_size_.height_), static_cast<int>(y) + component_height);
+
+            // Render the visible portion of the component
+            for (int x_ = start_x; x_ < end_x; ++x_)
+            {
+                for (int y_ = start_y; y_ < end_y; ++y_)
                 {
-                    const Color& src = colors[y_ - y][x_ - x];
-                    Color&       dst = pixel_buffer_[y_][x_];
+                    // Calculate component local coordinates
+                    int comp_x = x_ - x;
+                    int comp_y = y_ - y;
+
+                    // Skip invalid component coordinates (added safety check)
+                    if (comp_x < 0 || comp_y < 0 || comp_x >= component_width || comp_y >= component_height)
+                    {
+                        continue;
+                    }
+
+                    // Use explicit casts to size_t to avoid sign conversion warnings
+                    const Color& src = colors[static_cast<size_t>(comp_y)][static_cast<size_t>(comp_x)];
+                    Color&       dst = pixel_buffer_[static_cast<size_t>(y_)][static_cast<size_t>(x_)];
 
                     if (src.a_ == 255)
                     {
