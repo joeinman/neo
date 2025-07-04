@@ -1,21 +1,30 @@
+/*
+ * Copyright (c) 2025, Joe Inman
+ *
+ * Licensed under the MIT License.
+ * You may obtain a copy of the License at:
+ *     https://opensource.org/licenses/MIT
+ *
+ * This file is part of the Neo Library.
+ */
+
 #pragma once
 
+#include <functional>
 #include <vector>
 #include <memory>
 #include <queue>
-#include <functional>
-
-#include "neo/component/component.hpp"
-#include "neo/component/property_binding.hpp"
-#include "neo/portlist.hpp"
 #include <map>
+
+#include "neo/component/property_binding.hpp"
+#include "neo/component/component.hpp"
+#include "neo/portlist.hpp"
 
 namespace jsi::neo
 {
 
 class Scene
 {
-    // Comparator for component z-index sorting
     struct ComponentZIndexComparator
     {
         bool operator()(const std::pair<uint64_t, std::shared_ptr<Component>>& a,

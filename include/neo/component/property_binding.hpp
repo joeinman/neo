@@ -10,11 +10,12 @@
 
 #pragma once
 
-#include "component.hpp"
 #include <functional>
 #include <memory>
 #include <string>
 #include <type_traits>
+
+#include "component.hpp"
 
 namespace jsi::neo
 {
