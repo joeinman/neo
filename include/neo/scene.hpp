@@ -4,6 +4,7 @@
 #include <memory>
 #include <queue>
 #include <functional>
+#include <string>
 
 #include "neo/component/component.hpp"
 #include "neo/component/property_binding.hpp"
@@ -18,19 +19,17 @@ class Scene
     // Comparator for component z-index sorting
     struct ComponentZIndexComparator
     {
-        bool operator()(const std::pair<uint64_t, std::shared_ptr<Component>>& a,
-                        const std::pair<uint64_t, std::shared_ptr<Component>>& b) const
+        bool operator()(const std::pair<std::string, std::shared_ptr<Component>>& a,
+                        const std::pair<std::string, std::shared_ptr<Component>>& b) const
         {
-            // First compare by z-index
             uint8_t z_index_a = a.second->getProperty<uint8_t>("z_index").value_or(0);
             uint8_t z_index_b = b.second->getProperty<uint8_t>("z_index").value_or(0);
 
             if (z_index_a != z_index_b)
             {
-                return z_index_a > z_index_b;  // Lower z_index rendered first (appears at the back)
+                return z_index_a > z_index_b;
             }
 
-            // If z-indexes are equal, sort by ID for stable ordering
             return a.first > b.first;
         }
     };
@@ -40,10 +39,9 @@ public:
     virtual ~Scene() = default;
 
     template <typename T, typename... Args>
-    uint64_t addComponent(Args&&... args)
+    std::string addComponent(const std::string& id, Args&&... args)
     {
-        auto     component = std::make_shared<T>(std::forward<Args>(args)...);
-        uint64_t id        = next_id_++;
+        auto component = std::make_shared<T>(std::forward<Args>(args)...);
 
         components_.push(std::make_pair(id, component));
         component_lookup_[id] = component;
@@ -51,9 +49,9 @@ public:
         return id;
     }
 
-    std::vector<std::pair<uint64_t, std::shared_ptr<Component>>> getComponentsInZOrder() const
+    std::vector<std::pair<std::string, std::shared_ptr<Component>>> getComponentsInZOrder() const
     {
-        std::vector<std::pair<uint64_t, std::shared_ptr<Component>>> sorted_components;
+        std::vector<std::pair<std::string, std::shared_ptr<Component>>> sorted_components;
 
         auto queue_copy = components_;
         while (!queue_copy.empty())
@@ -65,7 +63,7 @@ public:
         return sorted_components;
     }
 
-    std::shared_ptr<Component> getComponent(uint64_t id)
+    std::shared_ptr<Component> getComponent(const std::string& id)
     {
         auto it = component_lookup_.find(id);
         if (it != component_lookup_.end())
@@ -76,7 +74,7 @@ public:
     }
 
     template <typename T>
-    bool setComponentProperty(uint64_t           id,
+    bool setComponentProperty(const std::string& id,
                               const std::string& key,
                               const T&           value,
                               TransitionType     transition_type    = TransitionType::kNone,
@@ -92,7 +90,7 @@ public:
     }
 
     template <typename T>
-    std::optional<T> getComponentProperty(uint64_t id, const std::string& key)
+    std::optional<T> getComponentProperty(const std::string& id, const std::string& key)
     {
         auto component = getComponent(id);
         if (component)
@@ -111,36 +109,36 @@ public:
     }
 
     template <typename SourceType, typename TargetType = SourceType>
-    uint64_t connectProperties(uint64_t           source_id,
-                               const std::string& source_key,
-                               uint64_t           target_id,
-                               const std::string& target_key)
+    std::string connectProperties(const std::string& source_id,
+                                  const std::string& source_key,
+                                  const std::string& target_id,
+                                  const std::string& target_key)
     {
         auto source_component = getComponent(source_id);
         auto target_component = getComponent(target_id);
 
         if (source_component && target_component)
         {
-            return addComponent<PropertyBinding<SourceType, TargetType>>(source_component,
+            std::string binding_id = "binding_" + source_id + "_" + source_key + "_" + target_id + "_" + target_key;
+            return addComponent<PropertyBinding<SourceType, TargetType>>(binding_id,
+                                                                         source_component,
                                                                          source_key,
                                                                          target_component,
                                                                          target_key);
         }
 
-        return 0;
+        return "";
     }
 
 private:
     // Map for fast component lookup by ID
-    std::map<uint64_t, std::shared_ptr<Component>> component_lookup_;
+    std::map<std::string, std::shared_ptr<Component>> component_lookup_;
 
     // Priority queue for z-index sorted components
-    std::priority_queue<std::pair<uint64_t, std::shared_ptr<Component>>,
-                        std::vector<std::pair<uint64_t, std::shared_ptr<Component>>>,
+    std::priority_queue<std::pair<std::string, std::shared_ptr<Component>>,
+                        std::vector<std::pair<std::string, std::shared_ptr<Component>>>,
                         ComponentZIndexComparator>
         components_;
-
-    uint64_t next_id_ = 0;
 };
 
 }  // namespace jsi::neo
