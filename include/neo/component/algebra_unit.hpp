@@ -26,12 +26,12 @@ public:
     AlgebraUnit(const CallbackFunction<OutputType>& callback_function) : Component()
     {
         callback_function_ = callback_function;
-        outputs_.set<OutputType>("output_value", OutputType());
+        properties_.set<OutputType>("output_value", OutputType());
     }
 
     void tick(uint64_t /*time_us*/) override
     {
-        outputs_.set<OutputType>("output_value", callback_function_(properties_));
+        properties_.set<OutputType>("output_value", callback_function_(properties_));
     }
 
 private:

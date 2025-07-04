@@ -38,7 +38,7 @@ public:
     {
         Component::tick(time_us);
 
-        auto source_value = source_component_->getOutput<T>(source_key_);
+        auto source_value = source_component_->getProperty<T>(source_key_);
         if (source_value.has_value())
         {
             target_component_->setProperty<T>(target_key_, source_value.value());

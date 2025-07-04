@@ -22,7 +22,7 @@ namespace jsi::neo
 class Component
 {
 public:
-    Component() {}
+    Component(uint8_t z_index = 0) { properties_.set<uint8_t>("z_index", z_index); }
     virtual ~Component() = default;
 
     virtual void                             tick(uint64_t /*time_us*/) {}
@@ -43,15 +43,8 @@ public:
         properties_.set<T>(key, value);
     }
 
-    template <typename T>
-    std::optional<T> getOutput(const std::string& key) const
-    {
-        return outputs_.get<T>(key);
-    }
-
 protected:
     PortList properties_;
-    PortList outputs_;
 };
 
 }  // namespace jsi::neo

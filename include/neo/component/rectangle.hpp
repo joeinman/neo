@@ -18,7 +18,8 @@ namespace jsi::neo
 class Rectangle : public Component
 {
 public:
-    Rectangle(uint8_t x, uint8_t y, uint8_t width, uint8_t height, Color color) : Component()
+    Rectangle(uint8_t x, uint8_t y, uint8_t width, uint8_t height, Color color, uint8_t z_index = 0) :
+        Component(z_index)
     {
         properties_.set<uint8_t>("x", x);
         properties_.set<uint8_t>("y", y);
