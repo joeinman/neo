@@ -19,7 +19,7 @@
 namespace jsi::neo
 {
 
-template <typename T>
+template <typename SourceType, typename TargetType = SourceType>
 class PropertyBinding : public Component
 {
 public:
@@ -38,10 +38,10 @@ public:
     {
         Component::tick(time_us);
 
-        auto source_value = source_component_->getProperty<T>(source_key_);
+        auto source_value = source_component_->getProperty<SourceType>(source_key_);
         if (source_value.has_value())
         {
-            target_component_->setProperty<T>(target_key_, source_value.value());
+            target_component_->setProperty<TargetType>(target_key_, static_cast<TargetType>(source_value.value()));
         }
     }
 

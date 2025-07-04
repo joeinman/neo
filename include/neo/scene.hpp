@@ -95,7 +95,7 @@ public:
         }
     }
 
-    template <typename T>
+    template <typename SourceType, typename TargetType = SourceType>
     uint64_t connectComponentProperty(uint64_t           source_id,
                                       const std::string& source_key,
                                       uint64_t           target_id,
@@ -106,7 +106,10 @@ public:
 
         if (source_component && target_component)
         {
-            return addComponent<PropertyBinding<T>>(source_component, source_key, target_component, target_key);
+            return addComponent<PropertyBinding<SourceType, TargetType>>(source_component,
+                                                                         source_key,
+                                                                         target_component,
+                                                                         target_key);
         }
 
         return 0;
