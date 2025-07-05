@@ -130,6 +130,43 @@ public:
         return "";
     }
 
+    template <typename SourceType, typename TargetType = SourceType>
+    bool disconnectProperties(const std::string& source_id,
+                              const std::string& source_key,
+                              const std::string& target_id,
+                              const std::string& target_key)
+    {
+        auto source_component = getComponent(source_id);
+        auto target_component = getComponent(target_id);
+
+        if (source_component && target_component)
+        {
+            std::string binding_id = "binding_" + source_id + "_" + source_key + "_" + target_id + "_" + target_key;
+            auto        binding    = getComponent(binding_id);
+            if (binding)
+            {
+                // Delete from the priority queue
+                std::priority_queue<std::pair<std::string, std::shared_ptr<Component>>,
+                                    std::vector<std::pair<std::string, std::shared_ptr<Component>>>,
+                                    ComponentZIndexComparator>
+                    new_queue;
+                while (!components_.empty())
+                {
+                    auto top = components_.top();
+                    components_.pop();
+                    if (top.first != binding_id)
+                    {
+                        new_queue.push(top);
+
+                        component_lookup_.erase(binding_id);
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+    }
+
 private:
     // Map for fast component lookup by ID
     std::map<std::string, std::shared_ptr<Component>> component_lookup_;
