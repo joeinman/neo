@@ -144,11 +144,13 @@ public:
 private:
     // Helper function to interpolate between values
     T interpolate(const T& start, const T& end, double t) const {
-        if constexpr (std::is_arithmetic_v<T>) {
+        if constexpr (std::is_enum_v<T>) {
+            // No fractional interpolation for enum types: switch value when complete
+            return (t < 1.0) ? start : end;
+        } else if constexpr (std::is_arithmetic_v<T>) {
             return static_cast<T>(start + (end - start) * t);
         } else {
-            // For non-arithmetic types, they must provide their own interpolation
-            // through operator+, operator-, and operator*
+            // Non-arithmetic types must support operators +, -, *
             return start + (end - start) * t;
         }
     }
