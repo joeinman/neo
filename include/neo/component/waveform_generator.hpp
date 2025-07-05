@@ -11,6 +11,7 @@
 #pragma once
 
 #include <cmath>
+#include <algorithm>
 
 #include "component.hpp"
 
@@ -35,6 +36,7 @@ public:
         properties_.set<bool>("enabled", true);
 
         properties_.set<double>("output_value", 0.0);
+        properties_.set<double>("cycle_position", 0.0);
     }
 
     void tick(uint64_t dt) override
@@ -43,36 +45,50 @@ public:
         auto type      = properties_.get<WaveformType>("waveform_type").value();
         auto enabled   = properties_.get<bool>("enabled").value_or(true);
 
-        if (enabled)
-        {
-            time_sec_ += static_cast<double>(dt) * 1e-6;
-        }
-        
-        double value;
+        // Read externally-set phase if present, otherwise use internal
+        double phase = properties_.get<double>("cycle_position").value();
+        // Normalize into [0,1)
+        phase = std::fmod(phase, 1.0);
+        if (phase < 0.0)
+            phase += 1.0;
 
+        if (!enabled)
+        {
+            return;
+        }
+
+        // Advance phase by frequency * dt_seconds
+        double dt_sec = static_cast<double>(dt) * 1e-6;
+        phase += frequency * dt_sec;
+        phase = std::fmod(phase, 1.0);
+        if (phase < 0.0)
+            phase += 1.0;
+
+        // Store updated phase internally and in properties
+        phase_ = phase;
+        properties_.set<double>("cycle_position", phase_);
+
+        // Compute output in [0,1] based on waveform type
+        double value = 0.0;
         switch (type)
         {
         case WaveformType::kSine:
-            value = 0.5 * (sin(2.0 * M_PI * frequency * time_sec_) + 1.0);
+            value = 0.5 * (std::sin(2.0 * M_PI * phase_) + 1.0);
             break;
+
         case WaveformType::kSquare:
-            value = (sin(2.0 * M_PI * frequency * time_sec_) >= 0) ? 1.0 : 0.0;
+            value = (std::sin(2.0 * M_PI * phase_) >= 0.0) ? 1.0 : 0.0;
             break;
+
         case WaveformType::kTriangle:
-        {
-            double phase = fmod(frequency * time_sec_, 1.0);
-            if (phase < 0.5)
-            {
-                value = phase * 2.0;
-            }
+            if (phase_ < 0.5)
+                value = phase_ * 2.0;
             else
-            {
-                value = 2.0 - (phase * 2.0);
-            }
+                value = 2.0 - (phase_ * 2.0);
             break;
-        }
+
         case WaveformType::kSawtooth:
-            value = fmod(frequency * time_sec_, 1.0);
+            value = phase_;
             break;
         }
 
@@ -80,7 +96,7 @@ public:
     }
 
 private:
-    double time_sec_ = 0.0;
+    double phase_ = 0.0;
 };
 
 }  // namespace jsi::neo
