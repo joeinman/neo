@@ -121,9 +121,9 @@ public:
                 float corr_g = std::pow(norm_g, inv_gamma_);
                 float corr_b = std::pow(norm_b, inv_gamma_);
 
-                uint8_t out_r = static_cast<uint8_t>(corr_r * 255.0f + 0.5f);
-                uint8_t out_g = static_cast<uint8_t>(corr_g * 255.0f + 0.5f);
-                uint8_t out_b = static_cast<uint8_t>(corr_b * 255.0f + 0.5f);
+                uint8_t out_r = static_cast<uint8_t>(corr_r * brightness_ * 255.0f + 0.5f);
+                uint8_t out_g = static_cast<uint8_t>(corr_g * brightness_ * 255.0f + 0.5f);
+                uint8_t out_b = static_cast<uint8_t>(corr_b * brightness_ * 255.0f + 0.5f);
 
                 set_pixel_function_(x, out_r, out_g, out_b, col.a_);
             }
@@ -132,11 +132,14 @@ public:
         show_function_();
     }
 
+    void setBrightness(float brightness) noexcept { brightness_ = std::clamp(brightness, 0.0f, 1.0f); }
+
 private:
     ScreenSize       screen_size_;
     SetPixelFunction set_pixel_function_;
     ShowFunction     show_function_;
     float            inv_gamma_;
+    float            brightness_ = 1.0;
     PixelBuffer      pixel_buffer_;
 };
 

@@ -49,6 +49,8 @@ public:
 
     std::shared_ptr<Scene> getScene() const noexcept { return scene_; }
 
+    void setScreenBrightness(float brightness) noexcept { screen_->setBrightness(brightness); }
+
 private:
     std::unique_ptr<Screen> screen_;
     std::shared_ptr<Scene>  scene_ = std::make_shared<Scene>();
