@@ -24,10 +24,12 @@ class Screen
 public:
     Screen(const ScreenSize&       screen_size,
            const SetPixelFunction& set_pixel_function,
-           const ShowFunction&     show_function) :
+           const ShowFunction&     show_function,
+           float                   gamma = 1.0f) :
         screen_size_(screen_size),
         set_pixel_function_(set_pixel_function),
         show_function_(show_function),
+        inv_gamma_(1.0f / gamma),
         pixel_buffer_(screen_size.height_, std::vector<Color>(screen_size.width_, Color(0, 0, 0, 0)))
     {}
     ~Screen() = default;
@@ -101,18 +103,32 @@ public:
             }
         }
 
-        // Render Pixel Buffer
+        // Write Pixel Buffer with Gamma Correction
         for (size_t y = 0; y < screen_size_.height_; ++y)
         {
             for (size_t x = 0; x < screen_size_.width_; ++x)
             {
-                const Color& color = pixel_buffer_[y][x];
-                uint8_t      r     = static_cast<uint8_t>((static_cast<float>(color.r_) * color.a_) / 255.0f);
-                uint8_t      g     = static_cast<uint8_t>((static_cast<float>(color.g_) * color.a_) / 255.0f);
-                uint8_t      b     = static_cast<uint8_t>((static_cast<float>(color.b_) * color.a_) / 255.0f);
-                set_pixel_function_(x, r, g, b, color.a_);
+                const Color& col   = pixel_buffer_[y][x];
+                uint8_t      raw_r = static_cast<uint8_t>((static_cast<float>(col.r_) * col.a_) / 255.0f);
+                uint8_t      raw_g = static_cast<uint8_t>((static_cast<float>(col.g_) * col.a_) / 255.0f);
+                uint8_t      raw_b = static_cast<uint8_t>((static_cast<float>(col.b_) * col.a_) / 255.0f);
+
+                float norm_r = raw_r / 255.0f;
+                float norm_g = raw_g / 255.0f;
+                float norm_b = raw_b / 255.0f;
+
+                float corr_r = std::pow(norm_r, inv_gamma_);
+                float corr_g = std::pow(norm_g, inv_gamma_);
+                float corr_b = std::pow(norm_b, inv_gamma_);
+
+                uint8_t out_r = static_cast<uint8_t>(corr_r * 255.0f + 0.5f);
+                uint8_t out_g = static_cast<uint8_t>(corr_g * 255.0f + 0.5f);
+                uint8_t out_b = static_cast<uint8_t>(corr_b * 255.0f + 0.5f);
+
+                set_pixel_function_(x, out_r, out_g, out_b, col.a_);
             }
         }
+
         show_function_();
     }
 
@@ -120,6 +136,7 @@ private:
     ScreenSize       screen_size_;
     SetPixelFunction set_pixel_function_;
     ShowFunction     show_function_;
+    float            inv_gamma_;
     PixelBuffer      pixel_buffer_;
 };
 

@@ -25,9 +25,10 @@ public:
     Neo(const ScreenSize&       screen_size,
         const SetPixelFunction& set_pixel_function,
         const ShowFunction&     show_function,
-        const MicrosFunction&   micros_function) noexcept
+        const MicrosFunction&   micros_function,
+        float                   gamma = 1.0f) noexcept
     {
-        screen_          = std::make_unique<Screen>(screen_size, set_pixel_function, show_function);
+        screen_          = std::make_unique<Screen>(screen_size, set_pixel_function, show_function, gamma);
         micros_function_ = micros_function;
     }
 
